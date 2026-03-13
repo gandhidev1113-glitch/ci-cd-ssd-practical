@@ -47,16 +47,19 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
       - name: Run OWASP Dependency Check
-        uses: dependency-check/Dependency-Check_Action@main
-        with:
-          project: 'secure-api'
-          path: '.'
-          format: 'HTML'
-          args: >
+        run: |
+          export JAVA_HOME=$JAVA_HOME_17_X64
+          wget https://github.com/jeremylong/DependencyCheck/releases/download/v9.0.9/dependency-check-9.0.9-release.zip
+          unzip dependency-check-9.0.9-release.zip
+          ./dependency-check/bin/dependency-check.sh \
+            --project "secure-api" \
+            --scan . \
+            --format HTML \
+            --out reports \
             --failOnCVSS 9
-            --enableRetired
       - name: Upload Report
         uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: dependency-check-report
           path: reports/
